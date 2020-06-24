@@ -1,28 +1,44 @@
 import 'dart:async';
 import './bloc.dart';
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import '../data/model/beer.dart';
+// import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+// import '../data/model/beer.dart';
+import '../services/graphql_service.dart';
 
 class BeerBloc extends Bloc<BeerEvent, BeerState> {
-  @override
-  BeerState get initialState => BeerInitial();
+  GraphQLService service;
+
+  BeerBloc() {
+    service = GraphQLService();
+  }
 
   @override
-  Stream<BeerState> mapEventToState(
-    BeerEvent event,
-  ) async* {
-    yield BeerLoading();
+  BeerState get initialState => BeerLoading();
+
+  @override
+  Stream<BeerState> mapEventToState(BeerEvent event) async* {
     if (event is GetBeer) {
-      try {
-        print("sending a get request");
-        // is this where you make graphql call?
-        final beer = Beer(beerName: "testbeer");
-        yield BeerLoaded(beer);
-      } finally {
-        print("maybe catch an error here");
-      }
+      print('getting beer but have not mapped');
+      yield* _mapGetBeerToState(event);
     }
-    // TODO: implement mapEventToState
+  }
+
+  Stream<BeerState> _mapGetBeerToState(GetBeer event) async* {
+    final query = event.query;
+    final variables = event.variables ?? null;
+
+    try {
+      print('fetching the data');
+      final result = await service.performQuery(query, variables: variables);
+
+      if (result.hasException) {
+        print('ERROR TIME');
+      } else {
+        yield BeerLoaded(result.data);
+      }
+    } catch (e) {
+      print(e);
+      // yield LoadDataFail(e.toString());
+    }
   }
 }

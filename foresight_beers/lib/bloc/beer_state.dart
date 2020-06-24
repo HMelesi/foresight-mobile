@@ -5,11 +5,11 @@ abstract class BeerState extends Equatable {
   const BeerState();
 }
 
-class BeerInitial extends BeerState {
-  const BeerInitial();
-  @override
-  List<Object> get props => [];
-}
+// class BeerInitial extends BeerState {
+//   const BeerInitial();
+//   @override
+//   List<Object> get props => [];
+// }
 
 class BeerLoading extends BeerState {
   const BeerLoading();
@@ -18,8 +18,8 @@ class BeerLoading extends BeerState {
 }
 
 class BeerLoaded extends BeerState {
-  final Beer beer;
-  const BeerLoaded(this.beer);
+  final dynamic data;
+  const BeerLoaded(this.data);
   @override
-  List<Object> get props => [beer];
+  List<Object> get props => data;
 }
