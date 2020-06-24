@@ -1,8 +1,6 @@
 import 'dart:async';
 import './bloc.dart';
-// import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import '../data/model/beer.dart';
 import '../services/graphql_service.dart';
 
 class BeerBloc extends Bloc<BeerEvent, BeerState> {
@@ -18,7 +16,6 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
   @override
   Stream<BeerState> mapEventToState(BeerEvent event) async* {
     if (event is GetBeer) {
-      print('getting beer but have not mapped');
       yield* _mapGetBeerToState(event);
     }
   }
@@ -28,7 +25,6 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
     final variables = event.variables ?? null;
 
     try {
-      print('fetching the data');
       final result = await service.performQuery(query, variables: variables);
 
       if (result.hasException) {

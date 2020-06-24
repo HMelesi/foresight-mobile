@@ -1,4 +1,3 @@
-import '../data/model/beer.dart';
 import 'package:equatable/equatable.dart';
 
 abstract class BeerState extends Equatable {

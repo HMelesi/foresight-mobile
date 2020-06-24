@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import '../data/model/beer.dart';
+import 'package:intl/intl.dart';
 import '../bloc/bloc.dart';
 
 class BeerListPage extends StatefulWidget {
@@ -11,6 +11,23 @@ class BeerListPage extends StatefulWidget {
 }
 
 class _BeerListPageState extends State<BeerListPage> {
+  final String query = r'''
+  {
+    beers {
+    name
+    type
+    abv
+    brewery
+    description
+    mash
+    hops
+    released
+  }
+  }
+  ''';
+
+  final percentformatter = new NumberFormat("##.##%");
+  final dateformatter = new DateFormat.yMMMd();
   List data = [];
 
   @override
@@ -20,83 +37,95 @@ class _BeerListPageState extends State<BeerListPage> {
 
   @override
   Widget build(BuildContext context) {
-    // getBeerByName(context, "test");
     return Scaffold(
       appBar: AppBar(
-        title: Text("Beer List"),
+        centerTitle: true,
+        backgroundColor: Colors.pink[100],
+        title: Text("Top Craft Beers in England"),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 16),
         alignment: Alignment.center,
-        child: BlocBuilder<BeerBloc, BeerState>(
-          builder: (BuildContext context, BeerState state) {
+        child: BlocListener<BeerBloc, BeerState>(
+          listener: (context, BeerState state) {
             if (state is BeerLoading) {
-              return buildLoading();
-            } else {
-              data = (state as BeerLoaded).data['beers'];
-              print("i am here");
-              return buildBeerLoaded();
+              print('refresh working?');
             }
           },
+          child: BlocBuilder<BeerBloc, BeerState>(
+            builder: (BuildContext context, BeerState state) {
+              if (state is BeerLoading) {
+                return buildLoading();
+              } else {
+                data = (state as BeerLoaded).data['beers'];
+                return buildBeerLoaded();
+              }
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget buildInitial() {
-    return Center(
-      child: new Text("initial page"),
-    );
-  }
-
   Widget buildLoading() {
     return Center(
-      child: Text("loading time"),
-      // child: CircularProgressIndicator(),
+      child: CircularProgressIndicator(),
     );
   }
 
   Widget buildBeerLoaded() {
-    return Container(
-      child: ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (BuildContext context, int index) {
-          var item = data[index];
-          return Card(
-            elevation: 4.0,
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              leading: Text(item['name']),
-              // title: Text(item['name']),
-              // trailing: Container(
-              //   padding: EdgeInsets.all(8.0),
-              //   decoration: BoxDecoration(
-              //     color: item['status'] == 'Dead'
-              //         ? Colors.red.withOpacity(0.3)
-              //         : item['status'] == 'Alive'
-              //             ? Colors.green.withOpacity(0.3)
-              //             : Colors.amber.withOpacity(0.3),
-              //     borderRadius: BorderRadius.circular(32.0),
-              //   ),
-              //   child: Text(
-              //     item['status'],
-              //     style: TextStyle(
-              //         color: item['status'] == 'Dead'
-              //             ? Colors.red
-              //             : item['status'] == 'Alive'
-              //                 ? Colors.green
-              //                 : Colors.amber),
-              //   ),
-              // ),
-            ),
-          );
-        },
-      ),
+    return Column(
+      children: <Widget>[
+        RaisedButton(
+          child: Icon(Icons.refresh),
+          onPressed: () {
+            print('pressed button');
+            // BeerBloc()..add(GetBeer(query));
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+              'These are the ${data.length} top beers in England according to Untappd'),
+        ),
+        Expanded(
+            child: ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (BuildContext context, int index) {
+            var item = data[index];
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 3,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                    color: Colors.pink[300],
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(children: <Widget>[
+                    Text(item['name']),
+                    Text(item['type']),
+                    Text(item['brewery']),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('ABV: ${percentformatter.format(item['abv'])}'),
+                          Text('Release Date: ${(item['released'])}'),
+                        ])
+                  ], crossAxisAlignment: CrossAxisAlignment.start),
+                ),
+              ),
+            );
+          },
+        )),
+      ],
     );
   }
 }
-
-// void getBeerByName(BuildContext context, String beerName) {
-//   final beerBloc = BlocProvider.of<BeerBloc>(context);
-//   beerBloc.add(GetBeer(beerName));
-// }
