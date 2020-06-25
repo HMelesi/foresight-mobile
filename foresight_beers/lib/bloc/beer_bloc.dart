@@ -16,6 +16,7 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
   @override
   Stream<BeerState> mapEventToState(BeerEvent event) async* {
     if (event is GetBeer) {
+      print('in event not mapped');
       yield* _mapGetBeerToState(event);
     }
   }
@@ -25,11 +26,14 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
     final variables = event.variables ?? null;
 
     try {
+      yield BeerLoading();
+      print('mapping event');
       final result = await service.performQuery(query, variables: variables);
 
       if (result.hasException) {
         print('ERROR TIME');
       } else {
+        print("ready to send");
         yield BeerLoaded(result.data);
       }
     } catch (e) {

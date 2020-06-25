@@ -43,27 +43,41 @@ class _BeerListPageState extends State<BeerListPage> {
         backgroundColor: Colors.pink[100],
         title: Text("Top Craft Beers in England"),
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        alignment: Alignment.center,
-        child: BlocListener<BeerBloc, BeerState>(
-          listener: (context, BeerState state) {
-            if (state is BeerLoading) {
-              print('refresh working?');
-            }
-          },
-          child: BlocBuilder<BeerBloc, BeerState>(
-            builder: (BuildContext context, BeerState state) {
-              if (state is BeerLoading) {
-                return buildLoading();
-              } else {
-                data = (state as BeerLoaded).data['beers'];
-                return buildBeerLoaded();
-              }
-            },
+      body: Column(
+        children: <Widget>[
+          buildButton(),
+          Expanded(
+            child: BlocListener<BeerBloc, BeerState>(
+              listener: (context, state) {
+                if (state is BeerLoaded) {
+                  print('i am listening');
+                }
+              },
+              child: BlocBuilder<BeerBloc, BeerState>(
+                builder: (BuildContext context, BeerState state) {
+                  if (state is BeerLoading) {
+                    return buildLoading();
+                  } else {
+                    print('trying to read data');
+                    data = (state as BeerLoaded).data['beers'];
+                    return buildBeerLoaded(context);
+                  }
+                },
+              ),
+            ),
           ),
-        ),
+        ],
       ),
+    );
+  }
+
+  Widget buildButton() {
+    return RaisedButton(
+      child: Icon(Icons.refresh),
+      onPressed: () {
+        print('pressed button');
+        refreshBeerList(context, query);
+      },
     );
   }
 
@@ -73,16 +87,9 @@ class _BeerListPageState extends State<BeerListPage> {
     );
   }
 
-  Widget buildBeerLoaded() {
+  Widget buildBeerLoaded(BuildContext context) {
     return Column(
       children: <Widget>[
-        RaisedButton(
-          child: Icon(Icons.refresh),
-          onPressed: () {
-            print('pressed button');
-            // BeerBloc()..add(GetBeer(query));
-          },
-        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Text(
@@ -127,5 +134,10 @@ class _BeerListPageState extends State<BeerListPage> {
         )),
       ],
     );
+  }
+
+  void refreshBeerList(BuildContext context, String query) {
+    final beerBloc = BlocProvider.of<BeerBloc>(context);
+    beerBloc.add(GetBeer(query));
   }
 }
