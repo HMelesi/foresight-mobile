@@ -28,6 +28,8 @@ class _BeerListPageState extends State<BeerListPage> {
 
   final percentformatter = new NumberFormat("##.##%");
   final dateformatter = new DateFormat.yMMMd();
+  final BeerBloc _beerBloc = BeerBloc();
+
   List data = [];
 
   @override
@@ -38,37 +40,39 @@ class _BeerListPageState extends State<BeerListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: Colors.pink[100],
-        title: Text("Top Craft Beers in England"),
-      ),
-      body: Column(
-        children: <Widget>[
-          buildButton(),
-          Expanded(
-            child: BlocListener<BeerBloc, BeerState>(
-              listener: (context, state) {
-                if (state is BeerLoaded) {
-                  print('i am listening');
-                }
-              },
-              child: BlocBuilder<BeerBloc, BeerState>(
-                builder: (BuildContext context, BeerState state) {
-                  if (state is BeerLoading) {
-                    return buildLoading();
-                  } else {
-                    print('trying to read data');
-                    data = (state as BeerLoaded).data['beers'];
-                    return buildBeerLoaded(context);
-                  }
-                },
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: Colors.pink[100],
+          title: Text("Top Craft Beers in England"),
+        ),
+        body: BlocProvider<BeerBloc>(
+          create: (BuildContext context) => _beerBloc..add(GetBeer(query)),
+          child: Column(
+            children: <Widget>[
+              buildButton(),
+              Expanded(
+                child: BlocListener<BeerBloc, BeerState>(
+                  listener: (context, state) {
+                    if (state is BeerLoaded) {
+                      print('i am listening');
+                    }
+                  },
+                  child: BlocBuilder<BeerBloc, BeerState>(
+                    builder: (BuildContext context, BeerState state) {
+                      if (state is BeerLoading) {
+                        return buildLoading();
+                      } else {
+                        print('trying to read data');
+                        data = (state as BeerLoaded).data['beers'];
+                        return buildBeerLoaded();
+                      }
+                    },
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget buildButton() {
@@ -87,7 +91,7 @@ class _BeerListPageState extends State<BeerListPage> {
     );
   }
 
-  Widget buildBeerLoaded(BuildContext context) {
+  Widget buildBeerLoaded() {
     return Column(
       children: <Widget>[
         Padding(
@@ -137,7 +141,6 @@ class _BeerListPageState extends State<BeerListPage> {
   }
 
   void refreshBeerList(BuildContext context, String query) {
-    final beerBloc = BlocProvider.of<BeerBloc>(context);
-    beerBloc.add(GetBeer(query));
+    _beerBloc.add(GetBeer(query));
   }
 }

@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 
 abstract class BeerState extends Equatable {
   const BeerState();
+  @override
+  List<Object> get props => [];
 }
 
 class BeerLoading extends BeerState {

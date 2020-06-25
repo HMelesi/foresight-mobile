@@ -30,12 +30,6 @@ String query = r'''
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Beer App',
-      home: BlocProvider<BeerBloc>(
-        create: (BuildContext context) => BeerBloc()..add(GetBeer(query)),
-        child: BeerListPage(),
-      ),
-    );
+    return MaterialApp(title: 'Beer App', home: BeerListPage());
   }
 }

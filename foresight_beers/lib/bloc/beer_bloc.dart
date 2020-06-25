@@ -1,5 +1,6 @@
 import 'dart:async';
 import './bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/graphql_service.dart';
 
@@ -33,6 +34,7 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
       if (result.hasException) {
         print('ERROR TIME');
       } else {
+        print(result.data);
         print("ready to send");
         yield BeerLoaded(result.data);
       }
