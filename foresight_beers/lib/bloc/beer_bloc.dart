@@ -27,9 +27,8 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
     final variables = event.variables ?? null;
 
     try {
-      yield BeerLoading();
       print('mapping event');
-      final result = await service.performQuery(query, variables: variables);
+      final result = await service.performMutation(query, variables: variables);
 
       if (result.hasException) {
         print('ERROR TIME');
@@ -40,7 +39,6 @@ class BeerBloc extends Bloc<BeerEvent, BeerState> {
       }
     } catch (e) {
       print(e);
-      // yield LoadDataFail(e.toString());
     }
   }
 }

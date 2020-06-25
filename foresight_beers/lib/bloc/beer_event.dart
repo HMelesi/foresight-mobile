@@ -4,7 +4,7 @@ abstract class BeerEvent extends Equatable {
   const BeerEvent();
 
   @override
-  List<Object> get props => null;
+  List<Object> get props => [];
 }
 
 class GetBeer extends BeerEvent {

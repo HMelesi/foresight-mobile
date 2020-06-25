@@ -11,25 +11,25 @@ class GraphQLService {
     _client = GraphQLClient(link: link, cache: InMemoryCache());
   }
 
-  Future<QueryResult> performQuery(String query,
-      {Map<String, dynamic> variables}) async {
-    QueryOptions options =
-        QueryOptions(documentNode: gql(query), variables: variables);
+  // Future<QueryResult> performQuery(String query,
+  //     {Map<String, dynamic> variables}) async {
+  //   QueryOptions options =
+  //       QueryOptions(documentNode: gql(query), variables: variables);
 
-    final result = await _client.query(options);
+  //   final result = await _client.query(options);
+  //   print(result);
+  //   return result;
+  // }
+
+  Future<QueryResult> performMutation(String query,
+      {Map<String, dynamic> variables}) async {
+    MutationOptions options =
+        MutationOptions(documentNode: gql(query), variables: variables);
+
+    final result = await _client.mutate(options);
+
+    print(result);
 
     return result;
   }
-
-  // Future<QueryResult> performMutation(String query,
-  //     {Map<String, dynamic> variables}) async {
-  //   MutationOptions options =
-  //       MutationOptions(documentNode: gql(query), variables: variables);
-
-  //   final result = await _client.mutate(options);
-
-  //   print(result);
-
-  //   return result;
-  // }
 }
